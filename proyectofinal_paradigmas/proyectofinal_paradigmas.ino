@@ -97,13 +97,23 @@ void loop(){
     if (left_distance >= right_distance){
       while (ultrasound() <= 15){
         Atras();
+        Atras();
+        Atras();
         Izquierda();
+        Izquierda();
+        Izquierda();
+        delay(1000);
       }
     }
     else {
       while(ultrasound() <= 15){
         Atras();
+        Atras();
+        Atras();
         Derecha();
+        Derecha();
+        Derecha();
+        delay(1000);
       }
     }
   }
