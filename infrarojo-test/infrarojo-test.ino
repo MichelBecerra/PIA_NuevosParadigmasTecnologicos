@@ -1,27 +1,5 @@
 /*
   Calibration
-
-  Demonstrates one technique for calibrating sensor input. The sensor readings
-  during the first five seconds of the sketch execution define the minimum and
-  maximum of expected values attached to the sensor pin.
-
-  The sensor minimum and maximum initial values may seem backwards. Initially,
-  you set the minimum high and listen for anything lower, saving it as the new
-  minimum. Likewise, you set the maximum low and listen for anything higher as
-  the new maximum.
-
-  The circuit:
-  - analog sensor (potentiometer will do) attached to analog input 0
-  - LED attached from digital pin 9 to ground
-
-  created 29 Oct 2008
-  by David A Mellis
-  modified 30 Aug 2011
-  by Tom Igoe
-
-  This example code is in the public domain.
-
-  http://www.arduino.cc/en/Tutorial/Calibration
 */
 
 // These constants won't change:
@@ -42,35 +20,47 @@ int sensorMax2 = 0;           // maximum sensor value
 void setup() {
   // turn on LED to signal the start of the calibration period:
   pinMode(5, OUTPUT);
+  pinMode(4, OUTPUT);
   pinMode(sensorPin1, INPUT);
   pinMode(sensorPin2, INPUT);
   Serial.begin(9600);
-  digitalWrite(5, HIGH);
+  digitalWrite(4, HIGH);
+  digitalWrite(5, LOW);
 
   // calibrate during the first five seconds
-  while (millis() < 10000) {
-    sensorValue1 = analogRead(sensorPin1);
-    sensorValue2 = analogRead(sensorPin2);
+  while (millis() < 5000) {
+    sensorValue1 = analogRead(sensorPin1);    
 
     // record the maximum sensor value
     if (sensorValue1 > sensorMax1) {
-      sensorMax1 = sensorValue2;
+      sensorMax1 = sensorValue1;
     }
-
-    if (sensorValue2 > sensorMax2) {
-      sensorMax2 = sensorValue1;
-    }
-    // record the minimum sensor value
+  
+//     record the minimum sensor value
     if (sensorValue1 < sensorMin1) {
       sensorMin1 = sensorValue1;
     }
+    
+  }
+
+  digitalWrite(5, HIGH);
+  digitalWrite(4, LOW);
+  while (millis() < 10000) {
+    sensorValue2 = analogRead(sensorPin2);
+
+    if (sensorValue2 > sensorMax2) {
+      sensorMax2 = sensorValue2;
+    }
+    //  record the minimum sensor value
     if (sensorValue2 < sensorMin2) {
       sensorMin2 = sensorValue2;
     }
   }
 
+
   // signal the end of the calibration period
   digitalWrite(4, LOW);
+  digitalWrite(5, LOW);
 }
 
 void loop() {
@@ -79,18 +69,18 @@ void loop() {
   sensorValue2 = analogRead(sensorPin2);
 
   // apply the calibration to the sensor reading
-  sensorValue1 = map(sensorValue1, sensorMin1, sensorMax1, 0, 100);
-  sensorValue2 = map(sensorValue2, sensorMin2, sensorMax2, 0, 100);
+  sensorValue1 = map(sensorValue1, sensorMin1, sensorMax1, 0, 150);
+  sensorValue2 = map(sensorValue2, sensorMin2, sensorMax2, 0, 150);
 
   // in case the sensor value is outside the range seen during calibration
-  sensorValue1 = constrain(sensorValue1, 0, 1);
-  sensorValue2 = constrain(sensorValue2, 0, 1);
+  sensorValue1 = constrain(sensorValue1, 0, 150);
+  sensorValue2 = constrain(sensorValue2, 0, 150);
 
   // fade the LED using the calibrated value:
-  analogWrite(4, sensorValue1);
-  analogWrite(5, sensorValue2);
+  analogWrite(4, sensorValue2);
+  analogWrite(5, sensorValue1);
 
-  if(j%5000 == 0) {
+  if(j%1000 == 0) {
     Serial.print("Sensor Derecho: ");
     Serial.println(sensorValue1);
     Serial.print("Sensor Izquierdo: ");
