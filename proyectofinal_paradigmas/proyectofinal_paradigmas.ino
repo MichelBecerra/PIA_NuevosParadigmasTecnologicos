@@ -82,7 +82,7 @@ void loop(){
 
   lectorLinea(valorSensorD, valorSensorI);
   
-  if(false && !ultraLoop()){
+  if(!ultraLoop()){
     // Gira hacia la izquierda, despues derecha
     delay(1000);
     left_distance = lookLeft();
@@ -91,23 +91,23 @@ void loop(){
     
     if (left_distance >= right_distance){
       while (ultrasound() <= 15){
-        Atras();
-        Atras();
-        Atras();
-        Izquierda();
-        Izquierda();
-        Izquierda();
+        Adelante();
+        Adelante();
+        Adelante();
+        Derecha();
+        Derecha();
+        Derecha();
         delay(1000);
       }
     }
     else {
       while(ultrasound() <= 15){
-        Atras();
-        Atras();
-        Atras();
-        Derecha();
-        Derecha();
-        Derecha();
+        Adelante();
+        Adelante();
+        Adelante();
+        Izquierda();
+        Izquierda();
+        Izquierda();
         delay(1000);
       }
     }
@@ -250,7 +250,7 @@ boolean ultraLoop(){
     Detener();
     return false;
   } else {
-    Adelante();
+    Atras();
     return true;  
   }
   return true;
