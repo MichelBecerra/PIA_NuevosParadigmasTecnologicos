@@ -9,8 +9,7 @@ int pos2 = 0;
 
 const int pinServo1 = 11;
 const int pinServo2 = 10;
-#define IZQ 0
-#define DER 1
+
 // PINAJE
 // MOTORES
 const int motorD = 7;   // Motor Derecho Salida Digital      PIN 7 ----> 2  SN
@@ -56,9 +55,9 @@ void setup(){
   pinMode(sensorI, INPUT);
   pinMode(trigPin, OUTPUT); // Sets the trigPin as an Output
   pinMode(echoPin, INPUT); // Sets the echoPin as an Input
-  myservo1.attach(pinServo1);  // attaches the servo on pin 9 to the servo object
-  myservo2.attach(pinServo2);
-  startPosition();
+  // myservo1.attach(pinServo1);  // attaches the servo on pin 9 to the servo object
+  // myservo2.attach(pinServo2);
+  // startPosition();
   
 }
 
@@ -66,55 +65,15 @@ void setup(){
 // 230-270 NEGRO
 
 void loop(){
-  int left_distance, right_distance;
-  digitalWrite(LEDI, LOW);
-  digitalWrite(LEDD, LOW);
-  myservo1.write(80);
-  myservo1.write(90);
-  
-  valorSensorD = binarizar(analogRead(sensorD), 600);
-  valorSensorI = binarizar(analogRead(sensorI), 600);
-
-  Serial.print("Sensor Derecho: ");
-  Serial.println(valorSensorD);
-  Serial.print("Sensor Izquierdo: ");
-  Serial.println(valorSensorI);
-
-  lectorLinea(valorSensorD, valorSensorI);
-  
-  if(!ultraLoop()){
-    // Gira hacia la izquierda, despues derecha
-    delay(1000);
-    left_distance = lookLeft();
-    right_distance = lookRight();
-    delay(2000);
-    
-    if (left_distance >= right_distance){
-      while (ultrasound() <= 15){
-        Adelante();
-        Adelante();
-        Adelante();
-        Derecha();
-        Derecha();
-        Derecha();
-        delay(1000);
-      }
-    }
-    else {
-      while(ultrasound() <= 15){
-        Adelante();
-        Adelante();
-        Adelante();
-        Izquierda();
-        Izquierda();
-        Izquierda();
-        delay(1000);
-      }
-    }
+  Atras();
+  delay(1000);
+  Adelante();
+  delay(1000);
+  Izquierda();
+  delay(1000);
+  Derecha();
+  delay(1000);
   }
-
-
-}
 
 int ultrasound(){
   // Clears the trigPin
@@ -180,26 +139,6 @@ void Izquierda(){
     
 }
 
-void IzquierdaAtras(){
-  Serial.println("IZQUIERDA");
-  digitalWrite(motorI, LOW);
-  digitalWrite(motorII, HIGH);
-
-  digitalWrite(motorD, LOW);
-  digitalWrite(motorDD, LOW);
-    
-}
-
-void DerechaAtras(){
-  Serial.println("DERECHA");
-  digitalWrite(motorI, LOW);
-  digitalWrite(motorII, LOW);
-
-  digitalWrite(motorD, LOW);
-  digitalWrite(motorDD, HIGH);
-    
-}
-
 void startPosition(){
   myservo2.write(0);
   for (pos2 = 0; pos2 <= 90; pos2 += 1) { // goes from 0 degrees to 90 degrees
@@ -250,49 +189,28 @@ boolean ultraLoop(){
     Detener();
     return false;
   } else {
-    Atras();
+    Adelante();
     return true;  
   }
   return true;
 }
 
 void lectorLinea(int valorSensorD, int valorSensorI){
-  static int memory = IZQ;
   Serial.print("LECTOR ACTIVADO");
-  if(valorSensorD < valorSensorI){
-    IzquierdaAtras();
+  if((valorSensorD < valorSensorI) && (valorSensorI - valorSensorD) > 100){
+    Izquierda();
     digitalWrite(LEDI, HIGH);
     digitalWrite(LEDD, LOW);
-    memory = IZQ;
   }
 
-  if(valorSensorD > valorSensorI){
-    DerechaAtras();
+  if(valorSensorD > valorSensorI && (valorSensorD - valorSensorI) > 100){
+    Derecha();
     digitalWrite(LEDI, LOW);
     digitalWrite(LEDD, HIGH);
-    memory = DER;
   }
 
-  if (valorSensorD == valorSensorI && valorSensorD == 0){
-    Atras();
+  if (valorSensorD == valorSensorI){
     digitalWrite(LEDD, LOW);
     digitalWrite(LEDI, LOW);
-  }
-  else {
-    if (memory == IZQ){
-      IzquierdaAtras();
-      digitalWrite(LEDI, HIGH);
-      digitalWrite(LEDD, LOW);   
-    }
-    else{
-      DerechaAtras();
-      digitalWrite(LEDI, LOW);
-      digitalWrite(LEDD, HIGH);
-    }
-  }
-  
-}
-
-int binarizar(int value, int umbral){
-  return value > umbral ? 255 : 0;
+  }  
 }
